@@ -1,0 +1,162 @@
+<?xml version='1.0'?>
+
+<robot name="wheel" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <link name='base_link'>
+    <pose>0 0 0 0 0 0</pose>
+
+    <inertial>
+      <mass value="15.0"/>
+      <origin xyz="-0.215 0 0.39" rpy=" 0 0 0"/>
+      <inertia
+          ixx="0.473625" ixy="0" ixz="0"
+          iyy="0.47928125" iyz="0"
+          izz="0.51190625"
+      />
+    </inertial>
+
+    <collision name='collision'>
+      <origin xyz="-0.215 0 0.39" rpy=" 0 0 0"/>
+      <geometry>
+        <box size="0.455 0.45 0.42"/>
+      </geometry>
+    </collision>
+
+    <visual name='base_link_visual'>
+      <origin xyz="-0.215 0 0.39" rpy=" 0 0 0"/>
+      <geometry>
+        <box size="0.455 0.45 0.42"/>
+      </geometry>
+    </visual>
+
+
+    <collision name='caster_collision'>
+      <origin xyz="0 0 0.09" rpy=" 0 0 0"/>
+      <geometry>
+        <sphere radius="0.09"/>
+      </geometry>
+      <surface>
+        <friction>
+          <ode>
+            <mu>0</mu>
+            <mu2>0</mu2>
+            <slip1>1.0</slip1>
+            <slip2>1.0</slip2>
+          </ode>
+        </friction>
+      </surface>
+    </collision>
+
+    <visual name='caster_visual'>
+      <origin xyz="0 0 0.09" rpy=" 0 0 0"/>
+      <geometry>
+        <sphere radius="0.09"/>
+      </geometry>
+    </visual>
+
+
+  </link>
+
+
+  <link name="left_wheel">
+    <!--origin xyz="0.1 0.13 0.1" rpy="0 1.5707 1.5707"/-->
+    <collision name="collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.28" length="0.05"/>
+      </geometry>
+    </collision>
+    <visual name="left_wheel_visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.28" length="0.05"/>
+      </geometry>
+    </visual>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="5"/>
+      <inertia
+        ixx=".09904" ixy="0.0" ixz="0.0"
+        iyy=".09904" iyz="0.0"
+        izz=".196"/>
+    </inertial>
+  </link>
+
+  <link name="right_wheel">
+    <!--origin xyz="0.1 -0.13 0.1" rpy="0 1.5707 1.5707"/-->
+    <collision name="collision">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.28" length="0.05"/>
+      </geometry>
+    </collision>
+    <visual name="right_wheel_visual">
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <cylinder radius="0.28" length="0.05"/>
+      </geometry>
+    </visual>
+    <inertial>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <mass value="5"/>
+      <inertia
+        ixx=".09904" ixy="0.0" ixz="0.0"
+        iyy=".09904" iyz="0.0"
+        izz=".196"/>
+    </inertial>
+  </link>
+
+
+  <joint type="continuous" name="left_wheel_hinge">
+    <origin xyz="-0.43 0.26 0.28" rpy="-1.5707 0 0"/>
+    <!--origin xyz="0.1 0.13 0" rpy="0 1.5707 1.5707"/-->
+    <child link="left_wheel"/>
+    <parent link="base_link"/>
+    <axis xyz="0 0 1"/>
+    <limit effort="10000" velocity="1000"/>
+    <joint_properties damping="1.0" friction="1.0"/>
+  </joint>
+
+  <joint type="continuous" name="right_wheel_hinge">
+    <origin xyz="-0.43 -0.26 0.28" rpy="-1.5707 0 0"/>
+    <!--origin xyz="0.1 -0.13 0" rpy="0 1.5707 1.5707"/-->
+    <child link="right_wheel"/>
+    <parent link="base_link"/>
+    <axis xyz="0 0 1" rpy="0 0 0"/>
+    <limit effort="10000" velocity="1000"/>
+    <joint_properties damping="1.0" friction="1.0"/>
+  </joint>
+
+
+
+
+<!-- Hokuyo Laser -->
+  <link name="hokuyo_link">
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <box size="0.1 0.1 0.1"/>
+      </geometry>
+    </collision>
+ 
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://rrbot_description/meshes/hokuyo.dae"/>
+      </geometry>
+    </visual>
+ 
+    <inertial>
+      <mass value="1e-5" />
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+    </inertial>
+  </link>
+  <joint name="hokuyo_joint" type="fixed">
+    <axis xyz="0 0 0" />
+    <origin xyz="0 0 0.63" rpy="0 0 0"/>
+    <parent link="base_link"/>
+    <child link="hokuyo_link"/>
+  </joint>
+
+</robot>
+

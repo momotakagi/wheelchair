@@ -24,10 +24,10 @@ class CmdVelToDiffDriveMotors:
     self.dt = 0.1
     self.prePx = 0
     self.prePz = 0
-    self.Kpx = 8
-    self.Kpz = 6
-    self.Kdx = 0.6
-    self.Kdz = 0.4
+    self.Kpx = 6
+    self.Kpz = 4
+    self.Kdx = 0.3
+    self.Kdz = 0.1
     
     port = '/dev/ttyUSB0'
     while True:

@@ -121,7 +121,7 @@
     <!--origin xyz="0.1 -0.13 0" rpy="0 1.5707 1.5707"/-->
     <child link="right_wheel"/>
     <parent link="base_link"/>
-    <axis xyz="0 0 1" rpy="0 0 0"/>
+    <axis xyz="0 0 -1" rpy="0 0 0"/>
     <limit effort="10000" velocity="1000"/>
     <joint_properties damping="1.0" friction="1.0"/>
   </joint>
@@ -157,6 +157,30 @@
     <parent link="base_link"/>
     <child link="hokuyo_link"/>
   </joint>
+
+
+
+  <gazebo>
+    <plugin name="differential_drive_controller" filename="libgazebo_ros_diff_drive.so">
+      <legacyMode>false</legacyMode>
+      <alwaysOn>true</alwaysOn>
+      <updateRate>20</updateRate>
+      <leftJoint>left_wheel_hinge</leftJoint>
+      <rightJoint>right_wheel_hinge</rightJoint>
+      <wheelSeparation>0.4</wheelSeparation>
+      <wheelDiameter>0.1</wheelDiameter>
+      <torque>20</torque>
+      <commandTopic>cmd_vel</commandTopic>
+      <odometryTopic>odom</odometryTopic>
+      <odometryFrame>odom</odometryFrame>
+      <robotBaseFrame>chassis</robotBaseFrame>
+    </plugin>
+  </gazebo>
+
+  <gazebo reference="chassis">
+      <material>Gazebo/Orange</material>
+    </gazebo>
+
 
 </robot>
 

@@ -30,7 +30,7 @@ class OdomPublisher:
     self.frame_id = rospy.get_param('~frame_id','/odom')
     self.child_frame_id = rospy.get_param('~child_frame_id','/base_footprint')
 
-    self.tf_broadcaster = tf.TransformBroadcaster()
+    #self.tf_broadcaster = tf.TransformBroadcaster()
 
     self.lwheel_angular_vel_enc = 0;
     self.rwheel_angular_vel_enc = 0;
@@ -132,7 +132,7 @@ class OdomPublisher:
     self.pose = self.pose_update();
     self.pose['th'] = math.atan2(math.sin(self.pose['th']),math.cos(self.pose['th'])) # squash the orientation to between -pi,pi
     self.pub_odometry(self.pose)
-    self.pub_tf(self.pose)        
+    #self.pub_tf(self.pose)        
 
 
   def spin(self):

@@ -2,12 +2,7 @@
   <master auto="start"/>
  <!-- Run the lazer -->
 
- <node name="horizontal_laser" pkg="urg_node"
-    type="urg_node" >
-    <param name="ip_address" value="192.168.0.15" />
-    <param name="frame_id" value="hokuyo_link" />
-    
-  </node>
+
 
 
 
@@ -23,19 +18,11 @@
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
 
 
-  <!-- Show in Rviz   -->
-  <node name="rviz" pkg="rviz" type="rviz"/>
 
 
 
 
 
-
-
-  <!-- Run the map server -->
-  <arg name="map_file" default="$(find my_robo_2dnav)/map/map.yaml"/>
-  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
-  </node>
  
 
 　<node pkg="tf" type="static_transform_publisher" name="base_tf" args="0 0 0.1 0 0 0 base_footprint base_link 100"></node>
@@ -55,10 +42,10 @@
     <param name="kld_err" value="0.05"/>
     <param name="kld_z" value="0.99"/>
     <param name="odom_alpha1" value="0.2"/>
-    <param name="odom_alpha2" value="0.1"/>
+    <param name="odom_alpha2" value="0.2"/>
     <!-- translation std dev, m -->
-    <param name="odom_alpha3" value="0.3"/>
-    <param name="odom_alpha4" value="0.3"/>
+    <param name="odom_alpha3" value="0.8"/>
+    <param name="odom_alpha4" value="0.2"/>
     <param name="laser_z_hit" value="0.5"/>
     <param name="laser_z_short" value="0.05"/>
     <param name="laser_z_max" value="0.05"/>
@@ -71,12 +58,12 @@
     <param name="laser_likelihood_max_dist" value="2.0"/>
     <param name="update_min_d" value="0.2"/>
     <param name="update_min_a" value="0.5"/>
-    <param name="odom_frame_id" value="/odom"/>
+    <param name="odom_frame_id" value="odom"/>
     <param name="resample_interval" value="1"/>
     <param name="transform_tolerance" value="0.1"/>
     <param name="recovery_alpha_slow" value="0.0"/>
     <param name="recovery_alpha_fast" value="0.0"/>
-    <param name="use_map_topic" value="true"/>
+    <param name="use_map_topic" value="false"/>
     <param name="laser_min_range" value="0.4"/>
     <param name="laser_max_range" value="10.0"/>
 
@@ -87,7 +74,7 @@
 
 
 
- <!--- Run Move Base -->
+  <!--- Run Move Base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <param name="allow_unknown" value="false" />
     <param name="global_planner" value="dwa_local_planner/DWAPlannerROS" />
@@ -98,9 +85,12 @@
     <!--rosparam file="$(find my_robo_2dnav)/move_base_params.yaml" command="load" /-->
     <!--rosparam file="$(find my_robo_2dnav)/base_local_planner_params.yaml" command="load" /-->
      <rosparam command="load" file="$(find my_robo_2dnav)/dwa_local_planner_params.yaml"/>
+
+
+ 
     <param name= "controller_frequency" value="5" type="double"/>  
-  
-</node>
+
+  </node>
 
 
 

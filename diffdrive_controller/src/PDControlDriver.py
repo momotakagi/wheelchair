@@ -17,7 +17,7 @@ class CmdVelToDiffDriveMotors:
 
 
     self.L = 0.227
-    self.R = 0.28
+    self.R = 0.2794
     self.rate = 10
     self.timeout_idle = 10
     self.time_prev_update = rospy.Time.now()
@@ -29,7 +29,7 @@ class CmdVelToDiffDriveMotors:
     self.Kdx = 0.3
     self.Kdz = 0.1
     
-    port = '/dev/ttyUSB0'
+    port = '/dev/ttyUSB1'
     while True:
       try:
         self.ser = serial.Serial(port,38400,8,serial.PARITY_EVEN)
@@ -110,12 +110,12 @@ class CmdVelToDiffDriveMotors:
 
     
 
-    AnglerZ = ((self.R*((Rrpm*math.pi)/30) - self.R*((Lrpm*math.pi)/30))) / (self.L) #rad/s
-    LinerX = ((self.R*((Rrpm*math.pi)/30) + self.R*((Lrpm*math.pi)/30))) / 2 # m/s
+    AnglerZ = ((self.R*Rrpm*math.pi)/30 - (self.R*Lrpm*math.pi)/30) / (self.L) #rad/s
+    LinerX = ((self.R*Rrpm*math.pi)/30 + (self.R*Lrpm*math.pi)/30) / 2 # m/s
 
-    #publish vel
-    self.Lv_pub.publish(self.R*((Lrpm*math.pi)/30))
-    self.Rv_pub.publish(self.R*((Rrpm*math.pi)/30))
+    #publish vel(rad/s)
+    self.Lv_pub.publish((Lrpm*math.pi)/30)
+    self.Rv_pub.publish((Rrpm*math.pi)/30)
 
     #DEBUG
     rospy.loginfo("nowZ(rad/s):" + str(AnglerZ) + " nowX(m/s):" + str(LinerX))

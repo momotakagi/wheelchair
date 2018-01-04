@@ -12,6 +12,13 @@
 
 
 
+  <arg name="razor_config_file" default="$(find razor_imu_9dof)/config/my_razor.yaml"/>
+  <node pkg="razor_imu_9dof" type="imu_node.py" name="imu_node" output="screen">
+    <rosparam file="$(arg razor_config_file)" command="load"/>
+    <remap from="imu" to="imu_data"/>
+  </node>
+
+
 
 
   <param name="robot_description" command="$(find xacro)/xacro.py '$(find wheel_description)/urdf/wheel.xacro'"/>
@@ -23,8 +30,7 @@
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
 
 
-  <!-- Show in Rviz   -->
-  <node name="rviz" pkg="rviz" type="rviz"/>
+ 
 
 
 
@@ -41,7 +47,29 @@
 　<node pkg="tf" type="static_transform_publisher" name="base_tf" args="0 0 0.1 0 0 0 base_footprint base_link 100"></node>
 
 
-  <!--- Run AMCL -->
+ 
+
+  
+ <!-- Show in Rviz   -->
+  <node name="rviz" pkg="rviz" type="rviz"/>
+ 
+
+
+<node pkg="robot_pose_ekf" type="robot_pose_ekf" name="robot_pose_ekf">
+  <param name="output_frame" value="odom"/>
+  <param name="base_footprint_frame" value="base_footprint"/>
+  <param name="freq" value="30.0"/>
+  <param name="sensor_timeout" value="1.0"/>  
+  <param name="odom_used" value="true"/>
+  <param name="imu_used" value="true"/>
+  <param name="vo_used" value="false"/>
+  <param name="publish_tf" value="true"/>
+  <param name="pub_odometry" value="true"/>
+
+  
+</node>
+
+<!--- Run AMCL -->
   <!--<include file="$(find amcl)/examples/amcl_diff.launch" />-->
   <node pkg="amcl" type="amcl" name="amcl" output="screen" >
     <!-- Publish scans from best pose at a max of 10 Hz -->
@@ -71,7 +99,7 @@
     <param name="laser_likelihood_max_dist" value="2.0"/>
     <param name="update_min_d" value="0.2"/>
     <param name="update_min_a" value="0.5"/>
-    <param name="odom_frame_id" value="/odom"/>
+    <param name="odom_frame_id" value="odom"/>
     <param name="resample_interval" value="1"/>
     <param name="transform_tolerance" value="0.1"/>
     <param name="recovery_alpha_slow" value="0.0"/>
@@ -82,12 +110,12 @@
 
 
   </node>
- 
 
 
 
 
- <!--- Run Move Base -->
+
+  <!--- Run Move Base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
     <param name="allow_unknown" value="false" />
     <param name="global_planner" value="dwa_local_planner/DWAPlannerROS" />
@@ -101,7 +129,6 @@
     <param name= "controller_frequency" value="5" type="double"/>  
   
 </node>
-
 
 
 

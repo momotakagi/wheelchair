@@ -16,7 +16,7 @@ class CmdVelToDiffDriveMotors:
     self.Rv_pub = rospy.Publisher('Rv_pub', Float32, queue_size=10)
 
 
-    self.L = 0.227
+    self.L = 0.454
     self.R = 0.2794
     self.rate = 10
     self.timeout_idle = 10
@@ -25,9 +25,9 @@ class CmdVelToDiffDriveMotors:
     self.prePx = 0
     self.prePz = 0
     self.Kpx = 6
-    self.Kpz = 4
+    self.Kpz = 6
     self.Kdx = 0.3
-    self.Kdz = 0.1
+    self.Kdz = 0.3
     
     port = '/dev/ttyUSB1'
     while True:

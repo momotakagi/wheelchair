@@ -22,8 +22,10 @@ class OdomPublisher:
     self.lwheel_angular_vel_enc_sub = rospy.Subscriber('Lv_pub', Float32, self.lwheel_angular_vel_enc_callback)    
     self.rwheel_angular_vel_enc_sub = rospy.Subscriber('Rv_pub', Float32, self.rwheel_angular_vel_enc_callback)    
     self.odom_pub = rospy.Publisher('odom', Odometry, queue_size=10)
+    #is cmd correct pid
+    self.cmd_vel_enc_pub = rospy.Publisher('cmd_vel_enc', Twist, queue_size=10)
 
-    self.L = 0.227 
+    self.L = 0.454 
     self.R = 0.2794
     self.rate = 10
     self.N = rospy.get_param('~robot_wheel_ticks', 20)
@@ -43,7 +45,7 @@ class OdomPublisher:
   def rwheel_angular_vel_enc_callback(self, msg):
     self.rwheel_angular_vel_enc = msg.data
 
-  # Compute angular velocity target
+  # Compute angular velocity target (m/s)
   def angularvel_2_tangentvel(self,angular_vel):
     tangent_vel = angular_vel * self.R
     return tangent_vel
@@ -86,8 +88,13 @@ class OdomPublisher:
     lwheel_tangent_vel_enc = self.angularvel_2_tangentvel(self.lwheel_angular_vel_enc)
     rwheel_tangent_vel_enc = self.angularvel_2_tangentvel(self.rwheel_angular_vel_enc)
     pose_next = self.pose_next(lwheel_tangent_vel_enc, rwheel_tangent_vel_enc)
+    cmd_vel_enc = Twist()
+    cmd_vel_enc.linear.x = pose_next['v']
+    cmd_vel_enc.angular.z = pose_next['w']
+    self.cmd_vel_enc_pub.publish(cmd_vel_enc)
 
     return pose_next
+
 
   def pub_odometry(self,pose):
     # Construct odometry message
@@ -97,6 +104,8 @@ class OdomPublisher:
     odom_msg.child_frame_id = self.child_frame_id
     odom_msg.pose.pose.position = Point(pose['x'], pose['y'], 0)
     odom_msg.pose.pose.orientation = Quaternion(*tf.transformations.quaternion_from_euler(0,0,pose['th']))
+
+    
     ODOM_POSE_COVARIANCE = [1e-3, 0, 0, 0, 0, 0, 
                             0, 1e-3, 0, 0, 0, 0,
                             0, 0, 1e6, 0, 0, 0,
@@ -111,8 +120,10 @@ class OdomPublisher:
                             0, 0, 0, 0, 0, 1e3]
     odom_msg.pose.covariance = ODOM_POSE_COVARIANCE
     odom_msg.twist.covariance = ODOM_TWIST_COVARIANCE
-#    P = numpy.mat(numpy.diag([0.0]*3)) # Dummy covariance
-#    odom_msg.pose.covariance = tuple(P.ravel().tolist())
+    
+
+    #P = numpy.mat(numpy.diag([0.0]*3)) # Dummy covariance
+    #odom_msg.pose.covariance = tuple(P.ravel().tolist())
     self.odom_pub.publish(odom_msg)
 
 

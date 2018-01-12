@@ -44,7 +44,7 @@
   </node>
  
 
-　<node pkg="tf" type="static_transform_publisher" name="base_tf" args="0 0 0.1 0 0 0 base_footprint base_link 100"></node>
+　<node pkg="tf" type="static_transform_publisher" name="base_tf" args="0 0 0 0 0 0 base_footprint base_link 100"></node>
 
 
  
@@ -63,7 +63,7 @@
   <param name="odom_used" value="true"/>
   <param name="imu_used" value="true"/>
   <param name="vo_used" value="false"/>
-  <param name="publish_tf" value="true"/>
+  <param name="publish_tf" value="false"/>
   <param name="pub_odometry" value="true"/>
 
   
@@ -71,44 +71,43 @@
 
 <!--- Run AMCL -->
   <!--<include file="$(find amcl)/examples/amcl_diff.launch" />-->
-  <node pkg="amcl" type="amcl" name="amcl" output="screen" >
-    <!-- Publish scans from best pose at a max of 10 Hz -->
-    <param name="odom_model_type" value="diff"/>
-    <param name="odom_alpha5" value="0.01"/>
-    <param name="transform_tolerance" value="0.2" />
-    <param name="gui_publish_rate" value="10.0"/>
-    <param name="laser_max_beams" value="10"/>
-    <param name="min_particles" value="500"/>
-    <param name="max_particles" value="5000"/>
-    <param name="kld_err" value="0.05"/>
-    <param name="kld_z" value="0.99"/>
-    <param name="odom_alpha1" value="0.1"/>
-    <param name="odom_alpha2" value="0.1"/>
-    <!-- translation std dev, m -->
-    <param name="odom_alpha3" value="0.1"/>
-    <param name="odom_alpha4" value="0.1"/>
-    <param name="laser_z_hit" value="0.5"/>
-    <param name="laser_z_short" value="0.05"/>
-    <param name="laser_z_max" value="0.05"/>
-    <param name="laser_z_rand" value="0.5"/>
-    <param name="laser_sigma_hit" value="0.2"/>
-    <param name="laser_lambda_short" value="0.1"/>
-    <param name="laser_lambda_short" value="0.1"/>
-    <param name="laser_model_type" value="likelihood_field"/>
-    <!-- <param name="laser_model_type" value="beam"/> -->
-    <param name="laser_likelihood_max_dist" value="2.0"/>
-    <param name="update_min_d" value="0.2"/>
-    <param name="update_min_a" value="0.5"/>
-    <param name="odom_frame_id" value="odom"/>
-    <param name="resample_interval" value="1"/>
-    <param name="transform_tolerance" value="0.1"/>
-    <param name="recovery_alpha_slow" value="0.0"/>
-    <param name="recovery_alpha_fast" value="0.0"/>
-    <param name="use_map_topic" value="true"/>
-    <param name="laser_min_range" value="0.4"/>
-    <param name="laser_max_range" value="10.0"/>
-
-
+  <node pkg="amcl" type="amcl" name="amcl">
+  <!-- Publish scans from best pose at a max of 10 Hz -->
+  <param name="odom_model_type" value="diff"/>
+  <param name="transform_tolerance" value="0.2" />
+  <param name="gui_publish_rate" value="10.0"/>
+  <param name="laser_max_beams" value="10"/>
+  <param name="min_particles" value="500"/>
+  <param name="max_particles" value="5000"/>
+  <param name="kld_err" value="0.05"/>
+  <param name="kld_z" value="0.99"/>
+  <param name="odom_alpha1" value="0.8"/>
+  <param name="odom_alpha2" value="0.8"/>
+  <!-- translation std dev, m -->
+  <param name="odom_alpha3" value="0.4"/>
+  <param name="odom_alpha4" value="0.2"/>
+  <param name="laser_z_hit" value="0.5"/>
+  <param name="laser_z_short" value="0.05"/>
+  <param name="laser_z_max" value="0.05"/>
+  <param name="laser_z_rand" value="0.5"/>
+  <param name="laser_sigma_hit" value="0.2"/>
+  <param name="laser_lambda_short" value="0.1"/>
+  <param name="laser_lambda_short" value="0.1"/>
+  <param name="laser_model_type" value="likelihood_field"/>
+  <param name="laser_model_type" value="beam"/> 
+  <param name="laser_likelihood_max_dist" value="2.0"/>
+  <param name="update_min_d" value="0.2"/>
+  <param name="update_min_a" value="0.2"/>
+  <param name="odom_frame_id" value="odom"/>
+  <param name="resample_interval" value="1"/>
+  <param name="transform_tolerance" value="0.1"/>
+  <param name="recovery_alpha_slow" value="0.0"/>
+  <param name="recovery_alpha_fast" value="0.0"/>
+  <param name="base_frame_id" value="base_footprint"/>
+  <param name="use_map_topic" value="true"/>
+  <param name="laser_min_range" value="0.4"/>
+  <param name="laser_max_range" value="10.0"/>
+  <remap from="scan" to="scan"/>
   </node>
  
 
@@ -117,19 +116,17 @@
 
 
   <!--- Run Move Base -->
+  <!--- Run Move Base -->
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <param name="allow_unknown" value="false" />
-    <param name="global_planner" value="dwa_local_planner/DWAPlannerROS" />
     <rosparam file="$(find my_robo_2dnav)/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find my_robo_2dnav)/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find my_robo_2dnav)/local_costmap_params.yaml" command="load" />
     <rosparam file="$(find my_robo_2dnav)/global_costmap_params.yaml" command="load" />
-    <!--rosparam file="$(find my_robo_2dnav)/move_base_params.yaml" command="load" /-->
-    <!--rosparam file="$(find my_robo_2dnav)/base_local_planner_params.yaml" command="load" /-->
-     <rosparam command="load" file="$(find my_robo_2dnav)/dwa_local_planner_params.yaml"/>
-    <param name= "controller_frequency" value="5" type="double"/>  
-  
-</node>
+    <rosparam file="$(find my_robo_2dnav)/move_base_params.yaml" command="load" />
+    <rosparam file="$(find my_robo_2dnav)/base_local_planner_params.yaml" command="load" />
+
+  </node>
+
 
 
 

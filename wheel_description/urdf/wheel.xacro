@@ -117,11 +117,11 @@
   </joint>
 
   <joint type="continuous" name="right_wheel_hinge">
-    <origin xyz="-0.43 -0.26 0.28" rpy="-1.5707 0 0"/>
+    <origin xyz="-0.43 -0.26 0.28" rpy="1.5707 0 0"/>
     <!--origin xyz="0.1 -0.13 0" rpy="0 1.5707 1.5707"/-->
     <child link="right_wheel"/>
     <parent link="base_link"/>
-    <axis xyz="0 0 -1" rpy="0 0 0"/>
+    <axis xyz="0 0 1" rpy="0 0 0"/>
     <limit effort="10000" velocity="1000"/>
     <joint_properties damping="1.0" friction="1.0"/>
   </joint>
@@ -172,7 +172,12 @@
         <box size="0.1 0.1 0.1"/>
       </geometry>
     </collision>
- 
+ <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="package://rrbot_description/meshes/hokuyo.dae"/>
+      </geometry>
+    </visual>
     <inertial>
       <mass value="1e-5" />
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -182,7 +187,7 @@
 
  <joint name="imu_joint" type="fixed">
     <axis xyz="0 0 0" />
-    <origin xyz="0 0 0.75" rpy="0 0 0"/>
+    <origin xyz="0 0 0.63" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="base_imu_link"/>
   </joint>

@@ -13,11 +13,12 @@ TrajectoryPlannerROS:
   xy_goal_tolerance: 0.8
 
   pdist_scale: 2.0 
-  gdist_scale: 0.3
+  gdist_scale: 0.8
   occdist_scale: 0.01
 
   heading_lookahead: 0.325
-  global_frame_id: map
+  global_frame_id: odom
   holonomic_robot: false
   meter_scoring: true
+  dwa: true
 

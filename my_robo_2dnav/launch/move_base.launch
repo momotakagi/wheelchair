@@ -5,6 +5,15 @@
 
 
 
+
+
+ <node name="horizontal_laser" pkg="urg_node"
+    type="urg_node" >
+    <param name="ip_address" value="192.168.0.15" />
+    <param name="frame_id" value="hokuyo_link" />
+    
+  </node>
+
   <param name="robot_description" command="$(find xacro)/xacro.py '$(find wheel_description)/urdf/wheel.xacro'"/>
 
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
@@ -18,20 +27,6 @@
 
 
 
-
-
- <!-- Run the lazer -->
-
- <node name="horizontal_laser" pkg="urg_node"
-    type="urg_node" >
-    <param name="ip_address" value="192.168.0.15" />
-    <param name="frame_id" value="hokuyo_link" />
-    
-  </node>
-
-
-
-
   <!-- Run the map server -->
   <arg name="map_file" default="$(find my_robo_2dnav)/map/map.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)">
@@ -41,68 +36,90 @@
 
 
 
+
   <!--- Run AMCL -->
-  <!--<include file="$(find amcl)/examples/amcl_diff.launch" />-->
+  <arg name="use_map_topic"   default="false"/>
+  <arg name="scan_topic"      default="scan_filtered"/> 
+  <arg name="initial_pose_x"  default="0.0"/>
+  <arg name="initial_pose_y"  default="0.0"/>
+  <arg name="initial_pose_a"  default="0.0"/>
+  <arg name="odom_frame_id"   default="odom"/>
+  <arg name="base_frame_id"   default="base_footprint"/>
+  <arg name="global_frame_id" default="map"/>
+  
+
   <node pkg="amcl" type="amcl" name="amcl">
-  <!-- Publish scans from best pose at a max of 10 Hz -->
-  <param name="odom_model_type" value="diff"/>
-  <param name="transform_tolerance" value="0.3" />
-  <param name="gui_publish_rate" value="10.0"/>
-  <param name="laser_max_beams" value="10"/>
-  <param name="min_particles" value="400"/>
-  <param name="max_particles" value="4000"/>
-  <param name="kld_err" value="0.05"/>
-  <param name="kld_z" value="0.99"/>
-  <param name="odom_alpha1" value="0.4"/>
-  <param name="odom_alpha2" value="0.4"/>
-  <!-- translation std dev, m -->
-  <param name="odom_alpha3" value="0.2"/>
-  <param name="odom_alpha4" value="0.2"/>
-
-  <param name="laser_z_hit" value="0.7"/>
-  <param name="laser_z_short" value="0.05"/>
-  <param name="laser_z_max" value="0.05"/>
-  <param name="laser_z_rand" value="0.2"/>
-
-  <param name="laser_sigma_hit" value="0.2"/>
-  <param name="laser_lambda_short" value="0.1"/>
-  <!-- param name="laser_model_type" value="likelihood_field"/-->
-  <param name="laser_model_type" value="beam"/> 
-  <param name="laser_likelihood_max_dist" value="2.0"/>
-  <param name="update_min_d" value="0.5"/>
-  <param name="update_min_a" value="0.3"/>
-  <param name="odom_frame_id" value="odom"/>
-  <param name="resample_interval" value="1"/>
-  <param name="transform_tolerance" value="0.4"/>
-  <param name="recovery_alpha_slow" value="0.0"/>
-  <param name="recovery_alpha_fast" value="0.0"/>
-  <param name="base_frame_id" value="base_footprint"/>
-  <param name="use_map_topic" value="true"/>
-  <param name="first_map_only" value="true"/>
-  <param name="laser_min_range" value="0.4"/>
-  <param name="laser_max_range" value="10.0"/>
-  <remap from="scan" to="scan"/>
+    <param name="use_map_topic"             value="$(arg use_map_topic)"/>
+    <!-- Publish scans from best pose at a max of 10 Hz -->
+    <param name="odom_model_type"           value="diff"/>
+    <param name="odom_alpha5"               value="0.1"/>
+    <param name="gui_publish_rate"          value="10.0"/>
+    <param name="laser_max_beams"           value="30"/>
+    <!-- param name="laser_min_range"           value="0.4"/ -->
+    <param name="laser_max_range"           value="8.0"/>
+    <param name="min_particles"             value="500"/>
+    <param name="max_particles"             value="1000"/>
+    <param name="kld_err"                   value="0.05"/>
+    <param name="kld_z"                     value="0.99"/>
+    <param name="odom_alpha1"               value="0.2"/>
+    <param name="odom_alpha2"               value="0.3"/>
+    <!-- translation std dev, m -->
+    <param name="odom_alpha3"               value="0.3"/>
+    <param name="odom_alpha4"               value="0.3"/>
+    <param name="laser_z_hit"               value="0.5"/>
+    <param name="laser_z_short"             value="0.05"/>
+    <param name="laser_z_max"               value="0.05"/>
+    <param name="laser_z_rand"              value="0.5"/>
+    <param name="laser_sigma_hit"           value="0.2"/>
+    <param name="laser_lambda_short"        value="0.1"/>
+    <param name="laser_model_type"          value="likelihood_field"/>
+    <!-- <param name="laser_model_type" value="beam"/> -->
+    <param name="laser_likelihood_max_dist" value="2.0"/>
+    <param name="update_min_d"              value="0.5"/>
+    <param name="update_min_a"              value="0.3"/>
+    <param name="odom_frame_id"             value="$(arg odom_frame_id)"/> 
+    <param name="base_frame_id"             value="$(arg base_frame_id)"/> 
+    <param name="global_frame_id"           value="$(arg global_frame_id)"/>
+    <param name="resample_interval"         value="0.8"/>
+    <!-- Increase tolerance because the computer can get quite busy -->
+    <param name="transform_tolerance"       value="1.0"/>
+    <param name="recovery_alpha_slow"       value="0.0"/>
+    <param name="recovery_alpha_fast"       value="0.0"/>
+    <param name="initial_pose_x"            value="$(arg initial_pose_x)"/>
+    <param name="initial_pose_y"            value="$(arg initial_pose_y)"/>
+    <param name="initial_pose_a"            value="$(arg initial_pose_a)"/>
+    <remap from="scan"                      to="$(arg scan_topic)"/>
   </node>
- 
-
 
 
 
  <!--- Run Move Base -->
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <param name="allow_unknown" value="false" />
-    <param name="global_planner" value="dwa_local_planner/DWAPlannerROS" />
-    <rosparam file="$(find my_robo_2dnav)/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find my_robo_2dnav)/costmap_common_params.yaml" command="load" ns="local_costmap" />
-    <rosparam file="$(find my_robo_2dnav)/local_costmap_params.yaml" command="load" />
-    <rosparam file="$(find my_robo_2dnav)/global_costmap_params.yaml" command="load" />
-    <!--rosparam file="$(find my_robo_2dnav)/move_base_params.yaml" command="load" /-->
-    <!--rosparam file="$(find my_robo_2dnav)/base_local_planner_params.yaml" command="load" /-->
-     <rosparam command="load" file="$(find my_robo_2dnav)/dwa_local_planner_params.yaml"/>
-    <param name= "controller_frequency" value="10" type="double"/>  
-  
-</node>
+  <arg name="odom_topic" default="odom" />
+  <arg name="laser_topic" default="scan" />
+  <arg name="custom_param_file" default="$(find my_robo_2dnav)/dummy.yaml"/>
 
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <rosparam file="$(find my_robo_2dnav)/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find my_robo_2dnav)/costmap_common_params.yaml" command="load" ns="local_costmap" />   
+    <rosparam file="$(find my_robo_2dnav)/local_costmap_params.yaml" command="load" />   
+    <rosparam file="$(find my_robo_2dnav)/global_costmap_params.yaml" command="load" />
+    <rosparam file="$(find my_robo_2dnav)/dwa_local_planner_params.yaml" command="load" />
+    <rosparam file="$(find my_robo_2dnav)/move_base_params.yaml" command="load" />
+    <rosparam file="$(find my_robo_2dnav)/global_planner_params.yaml" command="load" />
+    <rosparam file="$(find my_robo_2dnav)/navfn_global_planner_params.yaml" command="load" />
+
+    
+    <!-- reset frame_id parameters using user input data -->
+    <param name="global_costmap/global_frame" value="$(arg global_frame_id)"/>
+    <param name="global_costmap/robot_base_frame" value="$(arg base_frame_id)"/>
+    <param name="local_costmap/global_frame" value="$(arg odom_frame_id)"/>
+    <param name="local_costmap/robot_base_frame" value="$(arg base_frame_id)"/>
+    <param name="DWAPlannerROS/global_frame_id" value="$(arg odom_frame_id)"/>
+    <!-- param name="recovery_behavior_enabled" value="false" /-->
+
+    <remap from="odom" to="$(arg odom_topic)"/>
+    <remap from="scan" to="$(arg laser_topic)"/>
+  </node>
 
   <!-- Show in Rviz   -->
   <node name="rviz" pkg="rviz" type="rviz"/>

@@ -171,7 +171,7 @@
   </link>
   <joint name="hokuyo_joint" type="fixed">
     <axis xyz="0 0 0" />
-    <origin xyz="0 0 0.63" rpy="0 0 0"/>
+    <origin xyz="0.1007 0 0.0558" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="hokuyo_link"/>
   </joint>
@@ -205,7 +205,7 @@
 
  <joint name="imu_joint" type="fixed">
     <axis xyz="0 0 0" />
-    <origin xyz="0 0 0.63" rpy="0 0 0"/>
+    <origin xyz="0.1007 0 0.0558" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="base_imu_link"/>
   </joint>

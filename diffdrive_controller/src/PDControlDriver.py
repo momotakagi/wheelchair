@@ -24,11 +24,15 @@ class CmdVelToDiffDriveMotors:
     self.dt = 0.1
     self.prePx = 0
     self.prePz = 0
-    self.Kpx = 6
-    self.Kpz = 6
-    self.Kdx = 0.3
-    self.Kdz = 0.3
+    self.Kpx = 20
+    self.Kpz = 15
+    self.Kdx = 0.9
+    self.Kdz = 0.4
     
+    self.f_w = open('control_w_log.txt', 'w') # 書き込みモードで開く
+    self.f_v = open('control_v_log.txt', 'w')
+
+
     port = '/dev/ttyUSB1'
     while True:
       try:
@@ -76,6 +80,8 @@ class CmdVelToDiffDriveMotors:
 
   def shutdown(self):
     rospy.loginfo("Stop diffdrive_controller")
+    self.f_w.close()
+    self.f_v.close()
   	# Stop message    #シリアルで送信
     self.NowXper = 0;
     self.NowZper = 0;
@@ -121,6 +127,8 @@ class CmdVelToDiffDriveMotors:
     rospy.loginfo("nowZ(rad/s):" + str(AnglerZ) + " nowX(m/s):" + str(LinerX))
     rospy.loginfo("tarZ(rad/s):" + str(self.target_w) + " tarX(m/s):" + str(self.target_v))
 
+   
+
     
 
     #XのPD制御
@@ -156,6 +164,12 @@ class CmdVelToDiffDriveMotors:
     rospy.loginfo("Cx_per" + str(round(Cx_per)) + " self.NowXper:" + str(round(self.NowXper)))    
     rospy.loginfo("Cz_per" + str(round(Cz_per)) + " self.NowZper:" + str(round(self.NowZper)))
 
+
+     #logを書き込む
+    if self.target_w != 0:
+      self.f_w.write(str(self.target_w) + " " + str(AnglerZ)+ " " + str(round(self.NowZper)) +"\n") # 引数の文字列をファイルに書き込
+    if self.target_v != 0:
+      self.f_v.write(str(self.target_v) + " " + str(LinerX)+ " " + str(round(self.NowXper)) + "\n")
 
     self.write_wheel()
 

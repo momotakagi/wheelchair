@@ -18,19 +18,28 @@ class CmdVelToDiffDriveMotors:
 
     self.L = 0.454
     self.R = 0.2794
+    self.GearRatio = 15.43
     self.rate = 10
     self.timeout_idle = 10
     self.time_prev_update = rospy.Time.now()
     self.dt = 0.1
     self.prePx = 0
     self.prePz = 0
-    self.Kpx = 20
-    self.Kpz = 15
-    self.Kdx = 0.9
-    self.Kdz = 0.4
+    self.Ix = 0
+    self.Iz = 0
+
+    self.Kpx = 17 #17
+    self.Kpz = 15 #15
+
+    self.Kdx = 0.16 #0.16 増やすと応答が早くなる
+    self.Kdz = 0.08 #0.08
+
+    self.kix = 0.675 #0.675 増やすと振動する
+    self.kiz = 0.1 #0.1
     
-    self.f_w = open('control_w_log.txt', 'w') # 書き込みモードで開く
-    self.f_v = open('control_v_log.txt', 'w')
+
+    self.f_w = open('/home/student/catkin_ws2/src/Wheel_navigation/diffdrive_controller/control_log/control_w_log.txt', 'w') # 書き込みモードで開く
+    self.f_v = open('/home/student/catkin_ws2/src/Wheel_navigation/diffdrive_controller/control_log/control_v_log.txt', 'w')
 
 
     port = '/dev/ttyUSB1'
@@ -116,36 +125,44 @@ class CmdVelToDiffDriveMotors:
 
     
 
-    AnglerZ = ((self.R*Rrpm*math.pi)/30 - (self.R*Lrpm*math.pi)/30) / (self.L) #rad/s
-    LinerX = ((self.R*Rrpm*math.pi)/30 + (self.R*Lrpm*math.pi)/30) / 2 # m/s
+    AnglerZ = ((self.R*Rrpm*math.pi)/(30*self.GearRatio) - (self.R*Lrpm*math.pi)/(30*self.GearRatio)) / (self.L) #rad/s
+    LinerX = ((self.R*Rrpm*math.pi)/(30*self.GearRatio) + (self.R*Lrpm*math.pi)/(30*self.GearRatio)) / 2 # m/s
 
     #publish vel(rad/s)
-    self.Lv_pub.publish((Lrpm*math.pi)/30)
-    self.Rv_pub.publish((Rrpm*math.pi)/30)
+    self.Lv_pub.publish((Lrpm*math.pi)/(30*self.GearRatio))
+    self.Rv_pub.publish((Rrpm*math.pi)/(30*self.GearRatio))
 
     #DEBUG
     rospy.loginfo("nowZ(rad/s):" + str(AnglerZ) + " nowX(m/s):" + str(LinerX))
     rospy.loginfo("tarZ(rad/s):" + str(self.target_w) + " tarX(m/s):" + str(self.target_v))
 
-   
-
+    
     
 
-    #XのPD制御
+    rospy.loginfo("dt :" + str(self.dt))
+
+    #XのPID制御
     Px = self.target_v - LinerX
+    self.Ix += Px * self.dt
     Dx = (Px - self.prePx) / self.dt
-    Cx_per = Px*self.Kpx + self.Kdx*Dx
+    Cx_per = self.Kpx*Px + self.Kdx*Dx + self.kix*self.Ix
     self.NowXper += Cx_per
     self.prePx = Px
 
-    #ZのPD制御
+    #ZのPID制御
     #負の時はマイナス方向への旋回
     Pz = self.target_w - AnglerZ
+    self.Iz += Pz * self.dt
     Dz = (Pz - self.prePz) / self.dt
-    Cz_per = Pz*self.Kpz + self.Kdz*Dz
+    Cz_per = self.Kpz*Pz + self.Kdz*Dz + self.kiz*self.Iz
     self.NowZper += Cz_per
     self.prePz = Pz
 
+
+    #dtの更新
+    time_curr_update = rospy.Time.now()
+    self.dt = (time_curr_update - self.time_prev_update).to_sec()
+    self.time_prev_update = time_curr_update
 
 
     #並進0m/sの時しゃしゃらない

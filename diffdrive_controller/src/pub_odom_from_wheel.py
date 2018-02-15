@@ -97,7 +97,7 @@ class OdomPublisher:
     odom_msg.child_frame_id = self.child_frame_id
     odom_msg.pose.pose.position = Point(pose['x'], pose['y'], 0)
     odom_msg.pose.pose.orientation = Quaternion(*tf.transformations.quaternion_from_euler(0,0,pose['th']))
-    '''
+    
     ODOM_POSE_COVARIANCE = [1e-3, 0, 0, 0, 0, 0, 
                             0, 1e-3, 0, 0, 0, 0,
                             0, 0, 1e6, 0, 0, 0,
@@ -112,7 +112,7 @@ class OdomPublisher:
                             0, 0, 0, 0, 0, 1e3]
     odom_msg.pose.covariance = ODOM_POSE_COVARIANCE
     odom_msg.twist.covariance = ODOM_TWIST_COVARIANCE
-    '''
+    
 #    P = numpy.mat(numpy.diag([0.0]*3)) # Dummy covariance
 #    odom_msg.pose.covariance = tuple(P.ravel().tolist())
     self.odom_pub.publish(odom_msg)
